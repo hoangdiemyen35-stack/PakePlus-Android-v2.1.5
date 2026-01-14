@@ -2,33 +2,19 @@ window.addEventListener("DOMContentLoaded",()=>{const t=document.createElement("
 // 非常重要，不懂代码不要动，这里可以解决80%的问题，也可以生产1000+的bug
 const hookClick = (e) => {
     const origin = e.target.closest('a')
-    const isBaseTargetBlank = document.querySelector(
-        'head base[target="_blank"]'
-    )
-    console.log('origin', origin, isBaseTargetBlank)
-    if (
-        (origin && origin.href && origin.target === '_blank') ||
-        (origin && origin.href && isBaseTargetBlank)
-    ) {
-        e.preventDefault()
-        console.log('handle origin', origin)
-        location.href = origin.href
-    } else {
-        console.log('not handle origin', origin)
+    const isBaseTargetBlank = document.querySelector('head base[target="_blank"]')
+    // 合并【所有a链接】的拦截逻辑：普通链接+_blank链接+全局默认blank链接 全部拦截
+    if (origin && origin.href) {
+        e.preventDefault() // 彻底阻止「跳浏览器」的默认行为
+        location.href = origin.href // 强制在APP内置WebView打开
     }
 }
-// 拦截所有链接，在APP内打开
-document.addEventListener('click', function(e) {
-  const target = e.target.closest('a');
-  if (target && target.href) {
-    e.preventDefault();
-    window.location.href = target.href;
-  }
-}, true);
 
+// 重写JS的window.open方法，拦截所有JS代码触发的跳转
 window.open = function (url, target, features) {
     console.log('open', url, target, features)
     location.href = url
 }
 
+// 【最关键的这一行！你漏掉的总开关，必须加上】
 document.addEventListener('click', hookClick, { capture: true })
