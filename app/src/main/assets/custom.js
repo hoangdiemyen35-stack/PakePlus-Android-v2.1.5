@@ -17,6 +17,14 @@ const hookClick = (e) => {
         console.log('not handle origin', origin)
     }
 }
+// 拦截所有链接，在APP内打开
+document.addEventListener('click', function(e) {
+  const target = e.target.closest('a');
+  if (target && target.href) {
+    e.preventDefault();
+    window.location.href = target.href;
+  }
+}, true);
 
 window.open = function (url, target, features) {
     console.log('open', url, target, features)
